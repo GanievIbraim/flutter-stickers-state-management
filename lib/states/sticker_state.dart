@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../data/_data.dart';
-import '../ui/_ui.dart';
 
-class StickerState {
+class StickerState extends GetxController {
   StickerState._();
   static final _instance = StickerState._();
   factory StickerState() => _instance;
@@ -30,26 +29,31 @@ class StickerState {
     } else {
       stickersByCategory = stickers.where((e) => e.type == category.type).toList();
     }
+    update();
   }
 
   Future<void> onIncreaseQuantityTap(Sticker sticker) async {
     sticker.quantity++;
+    update();
   }
 
   Future<void> onDecreaseQuantityTap(Sticker sticker) async {
     if (sticker.quantity == 1) return;
     sticker.quantity--;
+    update();
   }
 
   Future<void> onAddToCartTap(Sticker sticker) async {
     sticker.cart = true;
     cart = stickers.where((e) => e.cart).toList();
+    update();
   }
 
   Future<void> onRemoveFromCartTap(Sticker sticker) async {
     sticker.cart = false;
     sticker.quantity = 1;
     cart = stickers.where((e) => e.cart).toList();
+    update();
   }
 
   Future<void> onCheckOutTap() async {
@@ -58,15 +62,18 @@ class StickerState {
       e.quantity = 1;
     }
     cart = stickers.where((e) => e.cart).toList();
+    update();
   }
 
   Future<void> onAddRemoveFavoriteTap(Sticker sticker) async {
     sticker.favorite = !sticker.favorite;
     favorite = stickers.where((e) => e.favorite).toList();
+    update();
   }
 
   void toggleTheme() {
     light = !light;
+    update();
   }
 
   //Вспомогательные  методы

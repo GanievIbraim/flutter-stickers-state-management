@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 import '../../data/_data.dart';
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 import '../_ui.dart';
 
 class CartScreen extends StatelessWidget {
   CartScreen({super.key});
-  var cartItems = AppData.cartItems;
+  final state = Get.find<StickerState>();
+  List<Sticker> get cartItems => state.cart;
   double taxes = 5.0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(context),
-      body: EmptyWrapper(
-        title: "Empty cart",
-        isEmpty: cartItems.isEmpty,
-        child: _cartListView(context),
+      body: GetBuilder<StickerState>(
+        builder: (_) => EmptyWrapper(
+          title: "Empty cart",
+          isEmpty: cartItems.isEmpty,
+          child: _cartListView(context),
+        ),
       ),
-      bottomNavigationBar: cartItems.isEmpty? const SizedBox.shrink() : _bottomAppBar(context),
+      bottomNavigationBar: GetBuilder<StickerState>(
+        builder: (_) => cartItems.isEmpty ? const SizedBox.shrink() : _bottomAppBar(context),
+      ),
     );
   }
 
@@ -42,10 +49,10 @@ class CartScreen extends StatelessWidget {
           direction: DismissDirection.endToStart,
           onDismissed: (direction) {
             if (direction == DismissDirection.endToStart) {
-              print('Удаляем');
+              state.onRemoveFromCartTap(sticker);
             }
           },
-          key: UniqueKey(),
+          key: ValueKey(sticker.id),
           background: Row(
             children: [
               Container(
@@ -92,12 +99,8 @@ class CartScreen extends StatelessWidget {
                 Column(
                   children: [
                     CounterButton(
-                      onIncrementTap: () {
-                        print('Увеличить количество');
-                      },
-                      onDecrementTap: () {
-                        print('Уменьшить количество');
-                      },
+                      onIncrementTap: () => state.onIncreaseQuantityTap(sticker),
+                      onDecrementTap: () => state.onDecreaseQuantityTap(sticker),
                       size: const Size(24, 24),
                       padding: 0,
                       label: Text(
@@ -106,7 +109,7 @@ class CartScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "\$10",
+                      "\$${state.stickerPrice(sticker)}",
                       style: AppTextStyle.h2Style.copyWith(color: AppColor.accent),
                     )
                   ],
@@ -148,7 +151,7 @@ class CartScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.headlineSmall,
                               ),
                               Text(
-                                "\$111",
+                                "\$${state.subtotal}",
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                             ],
@@ -185,7 +188,7 @@ class CartScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                               Text(
-                                "\$120.0",
+                                "\$${state.subtotal + taxes}",
                                 style: AppTextStyle.h2Style.copyWith(
                                   color: AppColor.accent,
                                 ),
@@ -200,7 +203,7 @@ class CartScreen extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: state.onCheckOutTap,
                               child: const Text("Checkout"),
                             ),
                           ),

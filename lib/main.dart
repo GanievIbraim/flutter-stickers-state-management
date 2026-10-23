@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import 'states/_states.dart';
 import 'ui/_ui.dart';
 import 'ui_kit/_ui_kit.dart';
 
 void main() {
+  Get.put(StickerState());
   runApp(const MyApp());
 }
 
@@ -13,10 +16,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Sunny Stickers',
-      theme: AppTheme.darkTheme,
-      home: const HomeScreen(),
+    return GetBuilder<StickerState>(
+      builder: (state) => MaterialApp(
+        title: 'Sunny Stickers',
+        theme: state.light ? AppTheme.lightTheme : AppTheme.darkTheme,
+        home: const HomeScreen(),
+      ),
     );
   }
 }

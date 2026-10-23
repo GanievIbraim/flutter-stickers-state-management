@@ -1,14 +1,18 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart' hide Badge;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:sun_stickers/ui/_ui.dart';
 
 import '../../data/_data.dart';
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 
 class StickerList extends StatelessWidget {
   StickerList({super.key});
-  var categories = AppData.categories;
+  final state = Get.find<StickerState>();
+
+  List<StickerCategory> get categories => state.categories;
 
 
   @override
@@ -33,8 +37,8 @@ class StickerList extends StatelessWidget {
                   "Available for you",
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
-                _categories(context),
-                StickerListView(stickers: AppData.stickers),
+                GetBuilder<StickerState>(builder: (_) => _categories(context)),
+                GetBuilder<StickerState>(builder: (state) => StickerListView(stickers: state.stickersByCategory)),
                 Padding(
                   padding: const EdgeInsets.only(top: 25, bottom: 5),
                   child: Row(
@@ -55,7 +59,7 @@ class StickerList extends StatelessWidget {
                   ),
                 ),
                 StickerListView(
-                  stickers: AppData.stickers,
+                  stickers: state.stickers,
                   isReversed: true,
                 ),
               ],
@@ -68,7 +72,7 @@ class StickerList extends StatelessWidget {
     return AppBar(
       leading: IconButton(
         icon: const FaIcon(FontAwesomeIcons.dice),
-        onPressed: () {},
+        onPressed: state.toggleTheme,
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -119,7 +123,7 @@ class StickerList extends StatelessWidget {
             itemBuilder: (_, index) {
               final category = categories[index];
               return GestureDetector(
-                onTap: () {},
+                onTap: () => state.onCategoryTap(category),
                 child: Container(
                   width: 100,
                   alignment: Alignment.center,
