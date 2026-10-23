@@ -4,6 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sun_stickers/ui/_ui.dart';
 
 import '../../data/_data.dart';
+import '../../main.dart';
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 
 class StickerList extends StatefulWidget {
@@ -14,13 +16,13 @@ class StickerList extends StatefulWidget {
 }
 
 class StickerListState extends State<StickerList> {
-  var categories = AppData.categories;
+  final state = StickerState();
+
+  List<StickerCategory> get categories => state.categories;
 
   void onCategoryTap(int selectedIndex) {
-    //Меняем выбранную категорию
-    categories.asMap().forEach((index, category) {
-      category.isSelected = index == selectedIndex;
-    });
+    //Меняем выбранную категорию и фильтруем продукты
+    state.onCategoryTap(categories[selectedIndex]);
     setState(() {});
   }
 
@@ -47,7 +49,7 @@ class StickerListState extends State<StickerList> {
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
                 _categories(),
-                StickerListView(stickers: AppData.stickers),
+                StickerListView(stickers: state.stickersByCategory),
                 Padding(
                   padding: const EdgeInsets.only(top: 25, bottom: 5),
                   child: Row(
@@ -68,7 +70,7 @@ class StickerListState extends State<StickerList> {
                   ),
                 ),
                 StickerListView(
-                  stickers: AppData.stickers,
+                  stickers: state.stickers,
                   isReversed: true,
                 ),
               ],
@@ -81,7 +83,7 @@ class StickerListState extends State<StickerList> {
     return AppBar(
       leading: IconButton(
         icon: const FaIcon(FontAwesomeIcons.dice),
-        onPressed: () {},
+        onPressed: () => context.findAncestorStateOfType<MyAppState>()?.onThemeTap(),
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../data/_data.dart';
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 import '../_ui.dart';
 
@@ -13,7 +14,10 @@ class CartScreen extends StatefulWidget {
 }
 
 class CartScreenState extends State<CartScreen> {
-  var cartItems = AppData.cartItems;
+  final state = StickerState();
+  final taxes = 5.00;
+
+  List<Sticker> get cartItems => state.cart;
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +51,11 @@ class CartScreenState extends State<CartScreen> {
           direction: DismissDirection.endToStart,
           onDismissed: (direction) {
             if (direction == DismissDirection.endToStart) {
-              print('Удаляем');
+              state.onRemoveFromCartTap(sticker);
+              setState(() {});
             }
           },
-          key: UniqueKey(),
+          key: ValueKey(sticker.id),
           background: Row(
             children: [
               Container(
@@ -98,10 +103,12 @@ class CartScreenState extends State<CartScreen> {
                   children: [
                     CounterButton(
                       onIncrementTap: () {
-                        print('Увеличить количество');
+                        state.onIncreaseQuantityTap(sticker);
+                        setState(() {});
                       },
                       onDecrementTap: () {
-                        print('Уменьшить количество');
+                        state.onDecreaseQuantityTap(sticker);
+                        setState(() {});
                       },
                       size: const Size(24, 24),
                       padding: 0,
@@ -111,7 +118,7 @@ class CartScreenState extends State<CartScreen> {
                       ),
                     ),
                     Text(
-                      "\$10",
+                      "\$${state.stickerPrice(sticker)}",
                       style: AppTextStyle.h2Style.copyWith(color: AppColor.accent),
                     )
                   ],
@@ -153,7 +160,7 @@ class CartScreenState extends State<CartScreen> {
                                 style: Theme.of(context).textTheme.headlineSmall,
                               ),
                               Text(
-                                "\$111",
+                                "\$${state.subtotal}",
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                             ],
@@ -170,7 +177,7 @@ class CartScreenState extends State<CartScreen> {
                                 style: Theme.of(context).textTheme.headlineSmall,
                               ),
                               Text(
-                                "\$${5.00}",
+                                "\$$taxes",
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                             ],
@@ -190,7 +197,7 @@ class CartScreenState extends State<CartScreen> {
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                               Text(
-                                "\$120.0",
+                                "\$${state.subtotal + taxes}",
                                 style: AppTextStyle.h2Style.copyWith(
                                   color: AppColor.accent,
                                 ),
@@ -205,7 +212,10 @@ class CartScreenState extends State<CartScreen> {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                state.onCheckOutTap();
+                                setState(() {});
+                              },
                               child: const Text("Checkout"),
                             ),
                           ),

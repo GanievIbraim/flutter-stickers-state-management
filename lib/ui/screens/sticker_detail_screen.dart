@@ -3,18 +3,23 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../data/_data.dart';
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 import '../widgets/_widgets.dart';
 
 class StickerDetail extends StatefulWidget {
-  const StickerDetail({super.key});
+  const StickerDetail({super.key, required this.sticker});
+
+  final Sticker sticker;
 
   @override
   State<StickerDetail> createState() => StickerDetailState();
 }
 
 class StickerDetailState extends State<StickerDetail> {
-  final sticker = AppData.stickers[0];
+  final state = StickerState();
+
+  Sticker get sticker => widget.sticker;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +50,10 @@ class StickerDetailState extends State<StickerDetail> {
     return FloatingActionButton(
       elevation: 0.0,
       backgroundColor: AppColor.accent,
-      onPressed: () {},
+      onPressed: () {
+        state.onAddRemoveFavoriteTap(sticker);
+        setState(() {});
+      },
       child: sticker.isFavorite ? const Icon(AppIcon.heart) : const Icon(AppIcon.outlinedHeart),
     );
   }
@@ -107,8 +115,14 @@ class StickerDetailState extends State<StickerDetail> {
                                 style: Theme.of(context).textTheme.displayLarge?.copyWith(color: AppColor.accent),
                               ),
                               CounterButton(
-                                onIncrementTap: () {},
-                                onDecrementTap: () {},
+                                onIncrementTap: () {
+                                  state.onIncreaseQuantityTap(sticker);
+                                  setState(() {});
+                                },
+                                onDecrementTap: () {
+                                  state.onDecreaseQuantityTap(sticker);
+                                  setState(() {});
+                                },
                                 label: Text(
                                   sticker.quantity.toString(),
                                   style: Theme.of(context).textTheme.displayLarge,
@@ -133,7 +147,10 @@ class StickerDetailState extends State<StickerDetail> {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 30),
                               child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  state.onAddToCartTap(sticker);
+                                  setState(() {});
+                                },
                                 child: const Text("Add to cart"),
                               ),
                             ),

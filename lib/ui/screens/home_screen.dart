@@ -11,7 +11,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  final List<Widget> screens = [const StickerList(), const CartScreen(), const FavoriteScreen(), const ProfileScreen()];
+  // Не const: при смене вкладки экраны должны перестроиться и заново прочитать StickerState.
+  // ignore: prefer_const_constructors
+  List<Widget> get screens => [StickerList(), CartScreen(), FavoriteScreen(), const ProfileScreen()];
   int currentIndex = 0;
 
   void onTabTap(int index) {
