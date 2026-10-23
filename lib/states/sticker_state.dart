@@ -1,117 +1,53 @@
-import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
 
 import '../data/_data.dart';
-import '../ui/_ui.dart';
 
-class StickerState {
-  StickerState._();
-  static final _instance = StickerState._();
-  factory StickerState() => _instance;
-
+class StickerState extends Equatable {
   //Переменные
-  List<StickerCategory> categories = AppData.categories;
-  List<Sticker> stickers = AppData.stickers;
-  List<Sticker> stickersByCategory = AppData.stickers;
-  List<Sticker> cart = <Sticker>[];
-  List<Sticker> favorite = <Sticker>[];
-  bool light = true;
+  final List<StickerCategory> categories;
+  final List<Sticker> stickers;
+  final List<Sticker> stickersByCategory;
+  final List<Sticker> cart;
+  final List<Sticker> favorite;
+  final bool light;
 
-  //Действия
-  Future<void> onCategoryTap(StickerCategory category) async {
-    categories = categories.map((e) {
-      if (e.type == category.type) {
-        return e.copyWith(isSelected: true);
-      } else {
-        return e.copyWith(isSelected: false);
-      }
-    }).toList();
+  StickerState({
+    List<StickerCategory>? categories,
+    List<Sticker>? stickers,
+    List<Sticker>? stickersByCategory,
+    this.cart = const <Sticker>[],
+    this.favorite = const <Sticker>[],
+    this.light = true,
+  })  : categories = categories ?? AppData.categories,
+        stickers = stickers ?? AppData.stickers,
+        stickersByCategory = stickersByCategory ?? AppData.stickers;
 
-    if (category.type == StickerType.all) {
-      stickersByCategory = stickers;
-    } else {
-      stickersByCategory = stickers.where((e) => e.type == category.type).toList();
-    }
+  @override
+  List<Object?> get props => [categories, stickers, stickersByCategory, cart, favorite, light];
+
+  StickerState copyWith({
+    List<StickerCategory>? categories,
+    List<Sticker>? stickers,
+    List<Sticker>? stickersByCategory,
+    List<Sticker>? cart,
+    List<Sticker>? favorite,
+    bool? light,
+  }) {
+    return StickerState(
+      categories: categories ?? this.categories,
+      stickers: stickers ?? this.stickers,
+      stickersByCategory: stickersByCategory ?? this.stickersByCategory,
+      cart: cart ?? this.cart,
+      favorite: favorite ?? this.favorite,
+      light: light ?? this.light,
+    );
   }
-
-  Future<void> onIncreaseQuantityTap(int stickerId) async {
-    stickers = stickers.map((e) {
-      if (e.id == stickerId) {
-        return e.copyWith(quantity: e.quantity + 1);
-      } else {
-        return e;
-      }
-    }).toList();
-  }
-
-  Future<void> onDecreaseQuantityTap(int stickerId) async {
-    stickers = stickers.map((e) {
-      if (e.id == stickerId) {
-        return e.quantity == 1 ? e : e.copyWith(quantity: e.quantity - 1);
-      } else {
-        return e;
-      }
-    }).toList();
-  }
-
-  Future<void> onAddToCartTap(int stickerId) async {
-    stickers = stickers.map((e) {
-      if (e.id == stickerId) {
-        return e.copyWith(cart: true);
-      } else {
-        return e;
-      }
-    }).toList();
-    cart = stickers.where((e) => e.cart).toList();
-  }
-
-  Future<void> onRemoveFromCartTap(int stickerId) async {
-    stickers = stickers.map((e) {
-      if (e.id == stickerId) {
-        return e.copyWith(cart: false, quantity: 1);
-      } else {
-        return e;
-      }
-    }).toList();
-    cart = stickers.where((e) => e.cart).toList();
-  }
-
-  Future<void> onCheckOutTap() async {
-    Set<int> cartIds = <int>{};
-    for (var item in cart) {
-      cartIds.add(item.id);
-    }
-    stickers = stickers.map((e) {
-      if (cartIds.contains(e.id)) {
-        return e.copyWith(cart: false, quantity: 1);
-      } else {
-        return e;
-      }
-    }).toList();
-    cart = stickers.where((e) => e.cart).toList();
-  }
-
-  Future<void> onAddRemoveFavoriteTap(int stickerId) async {
-    stickers = stickers.map((e) {
-      if (e.id == stickerId) {
-        return e.copyWith(favorite: !e.favorite);
-      } else {
-        return e;
-      }
-    }).toList();
-    favorite = stickers.where((e) => e.favorite).toList();
-  }
-
-  void toggleTheme() {
-    light = !light;
-  }
-
-  //List<Sticker> get cart => stickers.where((e) => e.cart).toList();
-  //List<Sticker> get favorite => stickers.where((e) => e.favorite).toList();
 
   int getIndex(int stickerId) {
     int index = stickers.indexWhere((e) => e.id == stickerId);
     return index;
   }
+
   Sticker getStickerById(int stickerId) {
     return stickers[getIndex(stickerId)];
   }
@@ -128,25 +64,4 @@ class StickerState {
     }
     return amount;
   }
-
-
-  //BLoC, Cubit, GetX, MobX, Provider, Riverpod, Redux
-
-  // 14 шагов логики
-  //
-  //
-  // 1.  Подсветка выбранной категории
-  // 2.  Продукты по категории
-  // 3.  Детали: отображение продукта
-  // 4.  Детали: количество
-  // 5.  Корзина: управление пустой корзиной
-  // 6.  Детали: добавление в корзину
-  // 7.  Корзина: список в корзине
-  // 8.  Корзина: стоимость корзины
-  // 9.  Корзина: количество
-  // 10. Корзина: удаление
-  // 11. Корзина: чистка корзина на checkout
-  // 12. Любимые: управление пустым экраном
-  // 13. Детали: Добавление/удаление любимые
-  // 14. Смена темы
 }

@@ -1,14 +1,15 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart' hide Badge;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sun_stickers/ui/_ui.dart';
 
 import '../../data/_data.dart';
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 
 class StickerList extends StatelessWidget {
-  StickerList({super.key});
-  var categories = AppData.categories;
+  const StickerList({super.key});
 
 
   @override
@@ -33,8 +34,12 @@ class StickerList extends StatelessWidget {
                   "Available for you",
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
-                _categories(context),
-                StickerListView(stickers: AppData.stickers),
+                BlocBuilder<StickerCubit, StickerState>(
+                  builder: (context, state) => _categories(context, state.categories),
+                ),
+                BlocBuilder<StickerCubit, StickerState>(
+                  builder: (_, state) => StickerListView(stickers: state.stickersByCategory),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 25, bottom: 5),
                   child: Row(
@@ -54,9 +59,11 @@ class StickerList extends StatelessWidget {
                     ],
                   ),
                 ),
-                StickerListView(
-                  stickers: AppData.stickers,
-                  isReversed: true,
+                BlocBuilder<StickerCubit, StickerState>(
+                  builder: (_, state) => StickerListView(
+                    stickers: state.stickers,
+                    isReversed: true,
+                  ),
                 ),
               ],
             ),
@@ -68,7 +75,7 @@ class StickerList extends StatelessWidget {
     return AppBar(
       leading: IconButton(
         icon: const FaIcon(FontAwesomeIcons.dice),
-        onPressed: () {},
+        onPressed: () => context.read<StickerCubit>().toggleTheme(),
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -109,7 +116,7 @@ class StickerList extends StatelessWidget {
     );
   }
 
-  Widget _categories(BuildContext context) {
+  Widget _categories(BuildContext context, List<StickerCategory> categories) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: SizedBox(
@@ -119,7 +126,7 @@ class StickerList extends StatelessWidget {
             itemBuilder: (_, index) {
               final category = categories[index];
               return GestureDetector(
-                onTap: () {},
+                onTap: () => context.read<StickerCubit>().onCategoryTap(category),
                 child: Container(
                   width: 100,
                   alignment: Alignment.center,
