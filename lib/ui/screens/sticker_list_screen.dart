@@ -1,14 +1,18 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart' hide Badge;
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sun_stickers/ui/_ui.dart';
 
 import '../../data/_data.dart';
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 
 class StickerList extends StatelessWidget {
   StickerList({super.key});
-  var categories = AppData.categories;
+  final state = StickerState();
+
+  List<StickerCategory> get categories => state.categories;
 
 
   @override
@@ -34,7 +38,7 @@ class StickerList extends StatelessWidget {
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
                 _categories(context),
-                StickerListView(stickers: AppData.stickers),
+                Observer(builder: (_) => StickerListView(stickers: state.stickersByCategory)),
                 Padding(
                   padding: const EdgeInsets.only(top: 25, bottom: 5),
                   child: Row(
@@ -55,7 +59,7 @@ class StickerList extends StatelessWidget {
                   ),
                 ),
                 StickerListView(
-                  stickers: AppData.stickers,
+                  stickers: state.stickers,
                   isReversed: true,
                 ),
               ],
@@ -68,7 +72,7 @@ class StickerList extends StatelessWidget {
     return AppBar(
       leading: IconButton(
         icon: const FaIcon(FontAwesomeIcons.dice),
-        onPressed: () {},
+        onPressed: state.toggleTheme,
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -119,19 +123,21 @@ class StickerList extends StatelessWidget {
             itemBuilder: (_, index) {
               final category = categories[index];
               return GestureDetector(
-                onTap: () {},
-                child: Container(
-                  width: 100,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: category.isSelected ? AppColor.accent : Colors.transparent,
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(15),
+                onTap: () => state.onCategoryTap(category),
+                child: Observer(
+                  builder: (_) => Container(
+                    width: 100,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: category.isSelected ? AppColor.accent : Colors.transparent,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(15),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    category.type.name.firstCapital,
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    child: Text(
+                      category.type.name.firstCapital,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
                   ),
                 ),
               );

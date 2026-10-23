@@ -1,22 +1,32 @@
-import 'package:flutter/material.dart';
+import 'package:mobx/mobx.dart';
 
 import '../data/_data.dart';
-import '../ui/_ui.dart';
 
-class StickerState {
+part 'sticker_state.g.dart';
+
+class StickerState extends _StickerState with _$StickerState {
   StickerState._();
   static final _instance = StickerState._();
   factory StickerState() => _instance;
+}
 
+abstract class _StickerState with Store {
   //Переменные
+  @observable
   List<StickerCategory> categories = AppData.categories;
+  @observable
   List<Sticker> stickers = AppData.stickers;
+  @observable
   List<Sticker> stickersByCategory = AppData.stickers;
+  @observable
   List<Sticker> cart = <Sticker>[];
+  @observable
   List<Sticker> favorite = <Sticker>[];
+  @observable
   bool light = true;
 
   //Действия
+  @action
   Future<void> onCategoryTap(StickerCategory category) async {
     categories.map((e) {
       if (e.type == category.type) {
@@ -32,26 +42,31 @@ class StickerState {
     }
   }
 
+  @action
   Future<void> onIncreaseQuantityTap(Sticker sticker) async {
     sticker.quantity++;
   }
 
+  @action
   Future<void> onDecreaseQuantityTap(Sticker sticker) async {
     if (sticker.quantity == 1) return;
     sticker.quantity--;
   }
 
+  @action
   Future<void> onAddToCartTap(Sticker sticker) async {
     sticker.cart = true;
     cart = stickers.where((e) => e.cart).toList();
   }
 
+  @action
   Future<void> onRemoveFromCartTap(Sticker sticker) async {
     sticker.cart = false;
     sticker.quantity = 1;
     cart = stickers.where((e) => e.cart).toList();
   }
 
+  @action
   Future<void> onCheckOutTap() async {
     for (var e in cart) {
       e.cart = false;
@@ -60,11 +75,13 @@ class StickerState {
     cart = stickers.where((e) => e.cart).toList();
   }
 
+  @action
   Future<void> onAddRemoveFavoriteTap(Sticker sticker) async {
     sticker.favorite = !sticker.favorite;
     favorite = stickers.where((e) => e.favorite).toList();
   }
 
+  @action
   void toggleTheme() {
     light = !light;
   }
